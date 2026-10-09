@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% block title %}Buyurtmalarim{% endblock %}
+
+{% block extra_css %}
+<style>
+  .page-header {
+    margin-bottom: 2rem;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+  }
+  .page-header p { color: var(--muted); }
+
+  .orders-list { display: flex; flex-direction: column; gap: 1rem; }
+  .order-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    transition: border-color 0.2s;
+  }
+  .order-item:hover { border-color: rgba(201,168,76,0.3); }
+
+  .order-icon {
+    width: 56px; height: 56px;
+    background: rgba(201,168,76,0.1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+  }
+  .order-main { flex: 1; }
+  .order-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+  .order-meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: flex; gap: 1rem; flex-wrap: wrap;
+  }
+  .order-right { text-align: right; }
+  .order-price {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.3rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge-yangi       { background: rgba(201,168,76,0.15); color: var(--gold); }
+  .badge-tasdiqlangan{ background: rgba(76,175,110,0.15); color: #4caf6e; }
+  .badge-tayyorlanmoqda{ background: rgba(66,153,225,0.15); color: #63b3ed; }
+  .badge-yetkazildi  { background: rgba(76,175,110,0.2); color: #4caf6e; }
+  .badge-bekor       { background: rgba(224,80,80,0.15); color: #e05050; }
+
+  .empty-state {
+    text-align: center;
+    padding: 5rem 2rem;
+    color: var(--muted);
+  }
+  .empty-state .big-icon { font-size: 4rem; margin-bottom: 1rem; }
+  .empty-state h2 { font-family: 'Playfair Display', serif; color: var(--text); margin-bottom: 0.5rem; }
+  .empty-state p { margin-bottom: 2rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <h1>📋 Mening Buyurtmalarim</h1>
+  <p>Barcha buyurtmalaringiz tarixi</p>
+</div>
+
+{% if buyurtmalar %}
+<div class="orders-list">
+  {% for b in buyurtmalar %}
+  <div class="order-item">
+    <div class="order-icon">{{ b.taom.kategoriya.emoji|default:"🍽️" }}</div>
+    <div class="order-main">
+      <div class="order-name">{{ b.taom.nom }}</div>
+      <div class="order-meta">
+        <span>📦 x{{ b.miqdor }}</span>
+        <span>👤 {{ b.mijoz }}</span>
+        <span>📱 {{ b.telefon }}</span>
+        {% if b.manzil %}<span>📍 {{ b.manzil }}</span>{% endif %}
+        <span>🕐 {{ b.vaqt|date:"d.m.Y H:i" }}</span>
+      </div>
+    </div>
+    <div class="order-right">
+      <div class="order-price">{{ b.jami_narx_formatted }}</div>
+      <div class="badge badge-{{ b.status }}">{{ b.get_status_display }}</div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="big-icon">🛒</div>
+  <h2>Hali buyurtma yo'q</h2>
+  <p>Menyudan biror taomni tanlang va buyurtma bering!</p>
+  <a href="{% url 'menu' %}" class="btn btn-gold">🍽 Menyuga o'tish</a>
+</div>
+{% endif %}
+{% endblock %}

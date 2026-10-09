@@ -1,0 +1,213 @@
+{% extends 'base.html' %}
+
+{% block title %}Buyurtma — {{ taom.nom }}{% endblock %}
+
+{% block extra_css %}
+<style>
+  .order-page {
+    max-width: 700px;
+    margin: 3rem auto;
+  }
+  .breadcrumb {
+    color: var(--muted);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+  .breadcrumb a { color: var(--gold); text-decoration: none; }
+  .order-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  .order-header {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    align-items: center;
+  }
+  .taom-icon {
+    width: 80px; height: 80px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #1f1f1f 0%, #2a2a2a 100%);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    overflow: hidden;
+  }
+  .taom-icon img { width: 100%; height: 100%; object-fit: cover; }
+  .taom-info h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    margin-bottom: 0.3rem;
+  }
+  .taom-info p { color: var(--muted); font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .taom-price { font-size: 1.3rem; font-weight: 700; color: var(--gold); }
+
+  .order-form { padding: 1.5rem; }
+  .form-group { margin-bottom: 1.25rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 0.85rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus,
+  .form-group textarea:focus {
+    border-color: var(--gold);
+  }
+  .form-group textarea { resize: vertical; min-height: 90px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .qty-wrap {
+    display: flex; align-items: center; gap: 1rem;
+  }
+  .qty-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: var(--surface); border: 1px solid var(--border);
+    color: var(--text); font-size: 1.2rem;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .qty-btn:hover { border-color: var(--gold); color: var(--gold); }
+  #qty-val {
+    font-size: 1.2rem; font-weight: 700; min-width: 2rem; text-align: center;
+  }
+  #qty-input { display: none; }
+
+  .total-bar {
+    background: rgba(201,168,76,0.08);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 1.5rem;
+  }
+  .total-label { color: var(--muted); font-size: 0.9rem; }
+  .total-price { font-size: 1.4rem; font-weight: 700; color: var(--gold); }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 12px;
+    padding: 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .submit-btn:hover {
+    background: var(--gold-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(201,168,76,0.25);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="order-page">
+  <div class="breadcrumb">
+    <a href="{% url 'menu' %}">← Menyuga qaytish</a>
+  </div>
+
+  <div class="order-card">
+    <div class="order-header">
+      <div class="taom-icon">
+        {% if taom.rasm %}
+          <img src="{{ taom.rasm.url }}" alt="{{ taom.nom }}">
+        {% else %}
+          {{ taom.kategoriya.emoji|default:"🍽️" }}
+        {% endif %}
+      </div>
+      <div class="taom-info">
+        <h2>{{ taom.nom }}</h2>
+        <p>{{ taom.tavsif|default:"Mazali va sifatli taom" }}</p>
+        <div class="taom-price">{{ taom.narx_formatted }}</div>
+      </div>
+    </div>
+
+    <form class="order-form" method="POST">
+      {% csrf_token %}
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>👤 Ismingiz</label>
+          <input type="text" name="mijoz"
+                 value="{{ user.first_name|default:'' }}"
+                 placeholder="To'liq ismingiz" required>
+        </div>
+        <div class="form-group">
+          <label>📱 Telefon</label>
+          <input type="tel" name="telefon"
+                 placeholder="+998 90 123 45 67" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>📍 Yetkazib berish manzili</label>
+        <input type="text" name="manzil" placeholder="Toshkent, Chilonzor, 123-uy">
+      </div>
+
+      <div class="form-group">
+        <label>🔢 Miqdor</label>
+        <input type="hidden" name="miqdor" id="qty-input" value="1">
+        <div class="qty-wrap">
+          <button type="button" class="qty-btn" onclick="changeQty(-1)">−</button>
+          <span id="qty-val">1</span>
+          <button type="button" class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>📝 Izoh (ixtiyoriy)</label>
+        <textarea name="izoh" placeholder="Qo'shimcha xohishlar (o'tkir, yog'siz, ...)"></textarea>
+      </div>
+
+      <div class="total-bar">
+        <span class="total-label">Jami to'lov:</span>
+        <span class="total-price" id="total-price">{{ taom.narx_formatted }}</span>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        🛒 Buyurtma berish
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const basePrice = {{ taom.narx }};
+  let qty = 1;
+
+  function changeQty(d) {
+    qty = Math.max(1, Math.min(20, qty + d));
+    document.getElementById('qty-val').textContent = qty;
+    document.getElementById('qty-input').value = qty;
+    const total = basePrice * qty;
+    document.getElementById('total-price').textContent =
+      total.toLocaleString('uz-UZ') + " so'm";
+  }
+</script>
+{% endblock %}

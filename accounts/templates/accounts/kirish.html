@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% block title %}Kirish — LazzatHaus{% endblock %}
+
+{% block extra_css %}
+<style>
+  .auth-wrap {
+    max-width: 440px;
+    margin: 4rem auto;
+  }
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+  .auth-logo h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--gold);
+  }
+  .auth-logo p { color: var(--muted); margin-top: 0.5rem; }
+
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2rem;
+  }
+
+  .google-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.85rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    margin-bottom: 1.5rem;
+  }
+  .google-btn:hover {
+    border-color: #4285f4;
+    color: #4285f4;
+    background: rgba(66,133,244,0.05);
+  }
+  .google-icon {
+    width: 20px; height: 20px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cpath fill='%234285F4' d='M44.5 20H24v8h11.8C34.7 33.9 29.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6-6C34.6 5.1 29.6 3 24 3 12.9 3 4 11.9 4 24s8.9 21 20 21c11 0 20-8 20-21 0-1.4-.1-2.7-.3-4H44.5z'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+
+  .divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin-bottom: 1.5rem;
+    color: var(--muted); font-size: 0.85rem;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1; height: 1px; background: var(--border);
+  }
+
+  .form-group { margin-bottom: 1.15rem; }
+  .form-group label {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.45rem;
+    font-weight: 500;
+  }
+  .form-group input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 0.8rem 1rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-group input:focus { border-color: var(--gold); }
+
+  .submit-btn {
+    width: 100%;
+    background: var(--gold);
+    color: #0a0a0a;
+    border: none;
+    border-radius: 12px;
+    padding: 0.9rem;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-top: 0.5rem;
+  }
+  .submit-btn:hover {
+    background: var(--gold-light);
+    transform: translateY(-1px);
+  }
+  .auth-footer {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .auth-footer a { color: var(--gold); text-decoration: none; font-weight: 500; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-logo">
+    <h2>🍽 LazzatHaus</h2>
+    <p>Tizimga kiring va buyurtma bering</p>
+  </div>
+
+  <div class="auth-card">
+    <!-- Google OAuth -->
+    <form method="post" action="{% url 'social:begin' 'google-oauth2' %}">
+      {% csrf_token %}
+      <button type="submit" class="google-btn">
+        <span class="google-icon"></span>
+        Google orqali kirish
+      </button>
+    </form>
+
+    <div class="divider">yoki</div>
+
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>👤 Username</label>
+        <input type="text" name="username" placeholder="username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label>🔒 Parol</label>
+        <input type="password" name="password" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="submit-btn">Kirish →</button>
+    </form>
+
+    <div class="auth-footer">
+      Hisobingiz yo'qmi? <a href="{% url 'royxatdan_otish' %}">Ro'yxatdan o'ting</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

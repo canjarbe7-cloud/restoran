@@ -1,0 +1,5 @@
+Django==5.2.18
+python-decouple==3.8
+social-auth-app-django==7.1.0
+python-telegram-bot==22.8
+Pillow==12.3.0
